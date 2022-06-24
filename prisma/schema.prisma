@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Operator {
+  id                  Int              @id @default(autoincrement())
+  name                String
+  email               String           @unique
+  service_provider    Service_provider @relation(fields: [service_provider_id], references: [id])
+  service_provider_id Int              @default(1)
+  contracts           Contract[]
+}
+
+model Service_provider {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  operators Operator[]
+}
+
+model Contract {
+  id          Int      @id @default(autoincrement())
+  tourist_id  Int
+  operator_id Int
+  created_at  DateTime @default(now())
+  operator    Operator @relation(fields: [operator_id], references: [id])
+  tourist     Tourist  @relation(fields: [tourist_id], references: [id])
+}
+
+model Tourist {
+  id          Int        @id @default(autoincrement())
+  name        String
+  passport_no String     @unique
+  country     String?
+  Contract    Contract[]
+}
